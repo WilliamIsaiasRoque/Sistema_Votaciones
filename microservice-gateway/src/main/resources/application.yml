@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  config:
+    import: optional:configserver:http://localhost:8888
+  application:
+    name: msvc-gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/spring-boot-realm-dev
+          jwk-set-uri: http://localhost:8081/realms/spring-boot-realm-dev/protocol/openid-connect/certs
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: msvc-users
+            uri: http://localhost:8090
+            predicates:
+              - Path=/keycloak/user/**
+          - id: keycloak
+            uri: http://localhost:8081
+            predicates:
+              - Path=/realms/**
+            filters:
+              - RewritePath=/realms/auth, /realms/spring-boot-realm-dev/protocol/openid-connect/token
+          - id: msvc-email-sender
+            uri: http://localhost:8082
+            predicates:
+              - Path=/mail/**
+          - id: voting-system
+            uri: http://localhost:8083
+            predicates:
+              - Path=/votes/**
+
+jwt:
+  auth:
+    converter:
+      resource-id: spring-client-api-rest
+      principle-attribute: preferred_username
