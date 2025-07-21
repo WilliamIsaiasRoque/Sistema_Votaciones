@@ -1,0 +1,17 @@
+spring:
+  config:
+    import: optional:configserver:http://localhost:8888
+  application:
+    name: voting-system
+  datasource:
+    url: jdbc:postgresql://localhost:5432/voting-system
+    username: postgres
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+server:
+  port: 8083
